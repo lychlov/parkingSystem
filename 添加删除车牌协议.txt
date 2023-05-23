@@ -1,0 +1,33 @@
+添加车牌号
+{ "Response_AlarmInfoPlate": {
+"white_list_operate":{ "operate_type" : 0, "white_list_data": [
+{ 
+"plate": "津AEM182", "enable": 1, "need_alarm": 0, "enable_time": "2023-05-01 11:11:11", "overdue_time": "2023-05-09 17:11:11"
+}
+]
+}
+}
+}
+
+删除车牌号
+
+{ "Response_AlarmInfoPlate": {
+"white_list_operate":{ "operate_type" : 1, "white_list_data": [
+{ 
+"plate": "津AEM182", "enable": 1, "need_alarm": 0
+}
+]
+}
+}
+}
+
+添加车牌和删除车牌区别在于"operate_type" : 0,的值，如果是0，表示是添加车牌添加车牌在addchepai_data库中，
+如果是1表示是删除车牌，删除车牌可以不带车牌有效期时间，删除的车牌在delchepai_data。
+
+手动识别
+{
+"Response_AlarmInfoPlate":
+{
+"manualTrigger" : "ok"
+}
+}
