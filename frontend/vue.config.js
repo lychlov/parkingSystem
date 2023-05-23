@@ -38,7 +38,7 @@ module.exports = {
     },
     proxy: {
       '/passports': {
-        target: 'http://127.0.0.1:8000/',
+        target: 'http://127.0.0.1:5000/',
         ws: true,
         changeOrigin: true,
         onProxyReq: function(proxyReq, req, res, options) {
@@ -51,32 +51,32 @@ module.exports = {
         }
       },
       '/cameras': {
-        target: 'http://127.0.0.1:8000/',
+        target: 'http://127.0.0.1:5000/',
         ws: true,
         changeOrigin: true
       },
       '/static_base': {
-        target: 'http://127.0.0.1:8000/',
+        target: 'http://127.0.0.1:5000/',
         ws: true,
         changeOrigin: true
       },
       '/records': {
-        target: 'http://127.0.0.1:8000/',
+        target: 'http://127.0.0.1:5000/',
         ws: true,
         changeOrigin: true
       },
       '/home_data': {
-        target: 'http://127.0.0.1:8000/',
+        target: 'http://127.0.0.1:5000/',
         ws: true,
         changeOrigin: true
       },
       '/user/info': {
-        target: 'http://127.0.0.1:8000/',
+        target: 'http://127.0.0.1:5000/',
         ws: true,
         changeOrigin: true
       },
       '/login': {
-        target: 'http://127.0.0.1:8000/',
+        target: 'http://127.0.0.1:5000/',
         ws: true,
         changeOrigin: true,
         onProxyReq: function(proxyReq, req, res, options) {
