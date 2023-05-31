@@ -6,8 +6,9 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication, BasicAuthentication
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
-from .models import Passport, Manager, Camera, Record
-from .serializers import PassportSerializer, CameraSerializer, RecordSerializer
+from .models import Passport, Manager, Camera, Record, Project, Role
+from django.contrib.auth.models import User
+from .serializers import PassportSerializer, CameraSerializer, RecordSerializer, ProjectSerializer, ManagerSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -51,6 +52,44 @@ class UserInfo(APIView):
         })
 
 
+class ProjectList(APIView):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        manager = Manager.objects.get(user=user)
+        query = request.GET
+        page = query.get('page', 1)  # 获取第几页
+        limit = query.get('limit', 20)  # 每页有多少条数据
+        if manager.role.name == 'admin':
+            queryset = Project.objects.all()
+        else:
+            queryset = manager.projects.all()
+        data_list = []
+        for i in queryset:
+            mode_to = ProjectSerializer(i).data  # exclude这个是转字典的时候去掉，哪个字段，就是不给哪个字段转成字典
+            data_list.append(mode_to)
+        resp = {
+            'code': 20000,
+            'data': {
+                'total': queryset.count(),
+                'items': data_list
+            }
+        }
+        return Response(resp)
+
+    def post(self, request, format=None):
+        item = request.data
+        serializer = ProjectSerializer(data=item)
+        if serializer.is_valid():
+            new_item = Project(**item)
+            new_item.save()
+            return Response(
+                {'code': 20000,
+                 'data': 'success',
+                 'item': serializer.data
+                 })
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class CameraList(APIView):
     def get(self, request, *args, **kwargs):
         # args:importance, type, title, page,limit = 20, sort
@@ -76,6 +115,30 @@ class CameraList(APIView):
             }
         }
         return Response(resp)
+
+    def post(self, request, format=None):
+        project_id = request.data.get('project_id')
+        project = Project.objects.get(id=project_id)
+        item = {
+            'name': request.data.get('name'),
+            'serial_number': request.data.get('serial_number'),
+            'project_id': project_id,
+            "project": ProjectSerializer(project).data
+        }
+        serializer = CameraSerializer(data=item)
+        if serializer.is_valid():
+            new_item = Camera(
+                name=request.data.get('name'),
+                serial_number=request.data.get('serial_number'),
+                project=project,
+            )
+            new_item.save()
+            return Response(
+                {'code': 20000,
+                 'data': 'success',
+                 'item': serializer.data
+                 })
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class RecordList(APIView):
@@ -108,6 +171,9 @@ class RecordList(APIView):
         for i in page_1:
             mode_to = RecordSerializer(i).data
             # mode_to['image_fake'] = mode_to['image'].replace('/static/', '/static_base/') if mode_to['image'] else '' # exclude这个是转字典的时候去掉，哪个字段，就是不给哪个字段转成字典
+            mode_to['auto_first_date'] = mode_to['auto_first_date'][:19].replace('T', ' ')
+            mode_to['manual_first_date'] = mode_to['manual_first_date'][:19].replace('T', ' ') if mode_to['manual_first_image_url'] else ''
+            mode_to['manual_second_date'] = mode_to['manual_second_date'][:19].replace('T', ' ') if mode_to['manual_second_image_url'] else ''
             data_list.append(mode_to)
         resp = {
             'code': 20000,
@@ -117,6 +183,68 @@ class RecordList(APIView):
             }
         }
         return Response(resp)
+
+
+class ManagerAuth(APIView):
+    def post(self, request, format=None):
+        item = request.data
+        manager = Manager.objects.get(id=item.get('user_id'))
+        try:
+            for p in item.get('projects'):
+                temp_project = Project.objects.get(id=p.get('id'))
+                manager.projects.add(temp_project)
+
+            manager.save()
+            return Response(
+                {'code': 20000,
+                 'data': 'success',
+                 })
+        except Exception as e:
+            return Response(e, status=status.HTTP_400_BAD_REQUEST)
+
+class ManagerList(APIView):
+    def get(self, request, *args, **kwargs):
+        query = request.GET
+        page = query.get('page', 1)  # 获取第几页
+        limit = query.get('limit', 20)  # 每页有多少条数据
+
+        queryset = Manager.objects.all()
+        data_list = []
+        for i in queryset:
+            mode_to = ManagerSerializer(i).data  # exclude这个是转字典的时候去掉，哪个字段，就是不给哪个字段转成字典
+            data_list.append(mode_to)
+        resp = {
+            'code': 20000,
+            'data': {
+                'total': queryset.count(),
+                'items': data_list
+            }
+        }
+        return Response(resp)
+
+    def post(self, request, format=None):
+        item = request.data
+        serializer = ManagerSerializer(data=item)
+        if serializer.is_valid():
+            new_user = User.objects.create_user(username=item.get('user_name'),
+                                                # email='jlennon@beatles.com',
+                                                password=item.get('password'))
+            new_user.save()
+            role = Role.objects.get(name=item.get('role'))
+            new_manager = Manager(
+                user=new_user,
+                name=item.get('name'),
+                phone=item.get('phone'),
+                work=item.get('work'),
+                role=role
+            )
+            new_manager.save()
+            return Response(
+                {'code': 20000,
+                 'data': 'success',
+                 'item': serializer.data
+                 })
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PassportList(APIView):
@@ -276,7 +404,7 @@ class DashboardView(APIView):
         camera = Camera.objects.count()
         passport = Passport.objects.count()
         record = Record.objects.count()
-        today = Record.objects.filter(record_date__gt=(datetime.datetime.now()-datetime.timedelta(days=1))).count()
+        today = Record.objects.filter(record_date__gt=(datetime.datetime.now() - datetime.timedelta(days=1))).count()
         resp = {
             'code': 20000,
             'status': True,

@@ -1,7 +1,8 @@
 import re
 
-from .models import Passport, Camera, Project, Record
+from .models import Passport, Camera, Project, Record, Manager, Role
 from rest_framework import serializers
+from django.contrib.auth.models import User
 
 
 def is_car_id(value):
@@ -14,7 +15,7 @@ def is_car_id(value):
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ('id', 'name', 'description')
+        fields = '__all__'
 
 
 class CameraSerializer(serializers.ModelSerializer):
@@ -22,7 +23,7 @@ class CameraSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Camera
-        fields = ('id', 'project', 'ip_address', 'camera_type',)
+        fields = '__all__'
 
 
 class RecordSerializer(serializers.ModelSerializer):
@@ -31,7 +32,7 @@ class RecordSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Record
-        fields = ('id', 'car_id', 'camera', 'record_date', 'image', 'is_in','image_in_base64')
+        fields = '__all__'
 
 
 class PassportSerializer(serializers.ModelSerializer):
@@ -41,3 +42,33 @@ class PassportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Passport
         fields = ('id', 'car_id', 'camera', 'enable_time', 'overdue_time', 'is_pushed', 'is_deleted')
+
+
+class RoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Role
+        fields = '__all__'
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username',)
+
+
+class ProjectSimpleSerializer(serializers.ModelSerializer):
+    name = serializers.CharField()
+
+    class Meta:
+        model = Project
+        fields = ('name',)
+
+
+class ManagerSerializer(serializers.ModelSerializer):
+    user = UserSerializer(many=False, read_only=True)
+    role = RoleSerializer(many=False, read_only=True)
+    projects = ProjectSimpleSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Manager
+        fields = '__all__'

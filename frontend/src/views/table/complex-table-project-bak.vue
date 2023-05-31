@@ -15,9 +15,9 @@
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
-      <!--      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">-->
-      <!--        添加-->
-      <!--      </el-button>-->
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+        添加
+      </el-button>
       <!--      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">-->
       <!--        Export-->
       <!--      </el-button>-->
@@ -41,119 +41,85 @@
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="车牌号" min-width="60px">
+      <el-table-column label="车牌号" width="150px" align="center">
         <template slot-scope="{row}">
           <span class="link-type" @click="handleUpdate(row)">{{ row.car_id }}</span>
-          <!--          <el-tag>{{ row.type | typeFilter }}</el-tag>-->
         </template>
       </el-table-column>
-      <el-table-column label="自动识别时间" width="200px" align="center">
+      <el-table-column label="可用时间" width="150px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.auto_first_date }}</span>
+          <span>{{ row.enable_time }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="自动识别截图" width="150px" align="center">
+      <el-table-column label="失效时间" width="150px" align="center">
         <template slot-scope="{row}">
-          <span @click="handleShowImage('/static_base/recognize_pics/' + row.auto_first_image_url)"><img :src="'/static_base/recognize_pics/' + row.auto_first_image_url" style="width:100%"></span>
+          <span>{{ row.overdue_time }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="第一次手动时间" width="200px" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.manual_first_date }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="第一次手动截图" width="150px" align="center">
-        <template slot-scope="{row}">
-
-          <span v-if="row.manual_first_image_url" @click="handleShowImage('/static_base/recognize_pics/' + row.manual_first_image_url)"><img :src="'/static_base/recognize_pics/' + row.manual_first_image_url" style="width:100%"></span>
-        </template>
-      </el-table-column>
-      <el-table-column label="第二次手动时间" width="200px" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.manual_second_date }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="第二次手动截图" width="150px" align="center">
-        <template slot-scope="{row}">
-          <span v-if="row.manual_second_image_url" @click="handleShowImage('/static_base/recognize_pics/' + row.manual_second_image_url)"><img :src="'/static_base/recognize_pics/' + row.manual_second_image_url" style="width:100%"></span>
-        </template>
-      </el-table-column>
-      <el-table-column label="摄像头" min-width="100px">
+      <el-table-column label="摄像头" min-width="150px">
         <template slot-scope="{row}">
           <!--          <span class="link-type" @click="handleUpdate(row)">{{ row.title }}</span>-->
-          <span>{{ row.camera.name }}</span>
+          <span>{{ row.camera.id }}| {{ row.camera.ip_address }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="项目" min-width="100px">
+      <el-table-column label="项目" min-width="150px">
         <template slot-scope="{row}">
-          <span>{{ row.camera.project.name }}</span>
+          <span>{{ row.camera.project.id }}| {{ row.camera.project.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="有效检测" class-name="status-col" width="100">
+      <el-table-column label="状态" class-name="status-col" width="100">
         <template slot-scope="{row}">
-          <el-tag v-if="row.is_valid" type="success">
-            有效
+          <el-tag v-if="row.is_pushed" type="success">
+            已生效
           </el-tag>
           <el-tag v-else type="info">
-            无效
+            未生效
+          </el-tag>
+          <el-tag v-if="row.is_deleted" type="danger">
+            已删除
           </el-tag>
         </template>
       </el-table-column>
-      <!--      <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width">-->
-      <!--        <template slot-scope="{row,$index}">-->
-      <!--          <el-button type="primary" size="mini" @click="handleUpdate(row)">-->
-      <!--            Edit-->
-      <!--          </el-button>-->
-      <!--          <el-button v-if="row.status!='published'" size="mini" type="success" @click="handleModifyStatus(row,'published')">-->
-      <!--            Publish-->
-      <!--          </el-button>-->
-      <!--          <el-button v-if="row.status!='draft'" size="mini" @click="handleModifyStatus(row,'draft')">-->
-      <!--            Draft-->
-      <!--          </el-button>-->
-      <!--          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,$index)">-->
-      <!--            Delete-->
-      <!--          </el-button>-->
-      <!--        </template>-->
-      <!--      </el-table-column>-->
+      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
+        <template slot-scope="{row,$index}">
+          <!--          <el-button type="primary" size="mini" @click="handleUpdate(row)">-->
+          <!--            -->
+          <!--          </el-button>-->
+          <el-button v-if="!row.is_pushed" size="mini" type="success" @click="handlePublish(row,$index)">
+            权限生效
+          </el-button>
+          <el-button v-if="!row.is_deleted" size="mini" type="danger" @click="handleDelete(row,$index)">
+            权限取消
+          </el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
-    <el-dialog title="车牌详情" :visible.sync="dialogImageVisible">
-      <el-image :src="image_url" />
-    </el-dialog>
-
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="Type" prop="type">
-          <el-select v-model="temp.type" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
+        <el-form-item label="车牌号" prop="car_id" label-width="100px">
+          <el-input v-model="temp.car_id" />
+        </el-form-item>
+        <el-form-item label="可用时间" prop="enable_time" label-width="100px">
+          <el-date-picker v-model="temp.enable_time" type="datetime" placeholder="Please pick a date" />
+        </el-form-item>
+        <el-form-item label="失效时间" prop="overdue_time" label-width="100px">
+          <el-date-picker v-model="temp.overdue_time" type="datetime" placeholder="Please pick a date" />
+        </el-form-item>
+        <el-form-item label="摄像头" prop="type" label-width="100px">
+          <el-select v-model="temp.camera_id" class="filter-item" placeholder="Please select">
+            <el-option v-for="item in cameraList" :key="item.id" :label="item.id + '|' + item.ip_address" :value="item.id" />
           </el-select>
-        </el-form-item>
-        <el-form-item label="Date" prop="timestamp">
-          <el-date-picker v-model="temp.timestamp" type="datetime" placeholder="Please pick a date" />
-        </el-form-item>
-        <el-form-item label="Title" prop="title">
-          <el-input v-model="temp.title" />
-        </el-form-item>
-        <el-form-item label="Status">
-          <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="Imp">
-          <el-rate v-model="temp.importance" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max="3" style="margin-top:8px;" />
-        </el-form-item>
-        <el-form-item label="Remark">
-          <el-input v-model="temp.remark" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
-          Cancel
+          取消
         </el-button>
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
-          Confirm
+          确认
         </el-button>
       </div>
     </el-dialog>
@@ -171,7 +137,7 @@
 </template>
 
 <script>
-import { fetchRecordList, fetchPv, createArticle, updateArticle, fetchCameraList } from '@/api/article'
+import { fetchList, fetchPv, createArticle, updateArticle, fetchCameraList, deletePassport, publishPassport } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -215,16 +181,17 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
+        camera_id: undefined,
         importance: undefined,
         title: undefined,
         type: undefined,
         sort: '-id'
       },
-      cameraList: null,
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
+      cameraList: null,
       sortOptions: [{ label: 'ID升序', key: '+id' }, { label: 'ID降序', key: '-id' }],
-      statusOptions: ['published', 'draft', 'deleted'],
+      statusOptions: ['已推送', 'draft', '已删除'],
       showReviewer: false,
       temp: {
         id: undefined,
@@ -235,8 +202,6 @@ export default {
         type: '',
         status: 'published'
       },
-      dialogImageVisible: false,
-      image_url: '',
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
@@ -246,9 +211,10 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
+        camera: [{ required: true, message: 'type is required', trigger: 'change' }],
+        enable_time: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
+        overdue_time: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
+        car_id: [{ required: true, message: 'title is required', trigger: 'blur' }]
       },
       downloadLoading: false
     }
@@ -269,7 +235,7 @@ export default {
     },
     getList() {
       this.listLoading = true
-      fetchRecordList(this.listQuery).then(response => {
+      fetchList(this.listQuery).then(response => {
         this.list = response.data.items
         this.total = response.data.total
 
@@ -326,24 +292,21 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'vue-element-admin'
+          console.log(this.temp)
+          // this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
+          // this.temp.author = 'vue-element-admin'
           createArticle(this.temp).then(() => {
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
             this.$notify({
               title: 'Success',
-              message: 'Created Successfully',
+              message: '添加成功',
               type: 'success',
               duration: 2000
             })
           })
         }
       })
-    },
-    handleShowImage(image_url) {
-      this.dialogImageVisible = true
-      this.image_url = image_url
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
@@ -373,14 +336,27 @@ export default {
         }
       })
     },
-    handleDelete(row, index) {
-      this.$notify({
-        title: 'Success',
-        message: 'Delete Successfully',
-        type: 'success',
-        duration: 2000
+    handlePublish(row, index) {
+      publishPassport(row.id).then(() => {
+        this.$notify({
+          title: 'Success',
+          message: '权限取消成功，等待推送',
+          type: 'success',
+          duration: 2000
+        })
       })
-      this.list.splice(index, 1)
+      // this.list.splice(index, 1)
+    },
+    handleDelete(row, index) {
+      deletePassport(row.id).then(() => {
+        this.$notify({
+          title: 'Success',
+          message: '权限取消成功，等待推送',
+          type: 'success',
+          duration: 2000
+        })
+      })
+      // this.list.splice(index, 1)
     },
     handleFetchPv(pv) {
       fetchPv(pv).then(response => {

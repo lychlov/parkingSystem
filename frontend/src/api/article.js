@@ -7,6 +7,7 @@ export function fetchList(query) {
     params: query
   })
 }
+
 export function fetchRecordList(query) {
   return request({
     url: '/records/',
@@ -30,11 +31,25 @@ export function fetchCameraList() {
   })
 }
 
+export function fetchManagerList() {
+  return request({
+    url: '/managers/',
+    method: 'get'
+  })
+}
+
+export function fetchProjectList() {
+  return request({
+    url: '/projects/',
+    method: 'get'
+  })
+}
+
 export function fetchArticle(id) {
   return request({
     url: '/vue-element-admin/article/detail',
     method: 'get',
-    params: { id }
+    params: {id}
   })
 }
 
@@ -42,7 +57,39 @@ export function fetchPv(pv) {
   return request({
     url: '/vue-element-admin/article/pv',
     method: 'get',
-    params: { pv }
+    params: {pv}
+  })
+}
+
+export function fetchManagerAuth(data) {
+  return request({
+    url: '/managers/auth/',
+    method: 'post',
+    data
+  })
+}
+
+export function createCamera(data) {
+  return request({
+    url: '/cameras/',
+    method: 'post',
+    data
+  })
+}
+
+export function createManager(data) {
+  return request({
+    url: '/managers/',
+    method: 'post',
+    data
+  })
+}
+
+export function createProject(data) {
+  return request({
+    url: '/projects/',
+    method: 'post',
+    data
   })
 }
 
@@ -53,11 +100,12 @@ export function createArticle(data) {
     data
   })
 }
+
 export function publishPassport(pk) {
   return request({
     url: '/passports/',
     method: 'put',
-    params: { pk }
+    params: {pk}
   })
 }
 
@@ -65,7 +113,7 @@ export function deletePassport(pk) {
   return request({
     url: '/passports/',
     method: 'delete',
-    params: { pk }
+    params: {pk}
   })
 }
 

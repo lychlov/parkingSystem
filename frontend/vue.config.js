@@ -50,10 +50,44 @@ module.exports = {
           }
         }
       },
+      '/managers': {
+        target: 'http://127.0.0.1:5000/',
+        ws: true,
+        changeOrigin: true,
+        onProxyReq: function(proxyReq, req, res, options) {
+          if (req.body) {
+            const bodyData = JSON.stringify(req.body)
+            proxyReq.setHeader('Content-Type', 'application/json')
+            proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData))
+            proxyReq.write(bodyData)
+          }
+        }
+      },
       '/cameras': {
         target: 'http://127.0.0.1:5000/',
         ws: true,
-        changeOrigin: true
+        changeOrigin: true,
+        onProxyReq: function(proxyReq, req, res, options) {
+          if (req.body) {
+            const bodyData = JSON.stringify(req.body)
+            proxyReq.setHeader('Content-Type', 'application/json')
+            proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData))
+            proxyReq.write(bodyData)
+          }
+        }
+      },
+      '/projects': {
+        target: 'http://127.0.0.1:5000/',
+        ws: true,
+        changeOrigin: true,
+        onProxyReq: function(proxyReq, req, res, options) {
+          if (req.body) {
+            const bodyData = JSON.stringify(req.body)
+            proxyReq.setHeader('Content-Type', 'application/json')
+            proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData))
+            proxyReq.write(bodyData)
+          }
+        }
       },
       '/static_base': {
         target: 'http://127.0.0.1:5000/',
