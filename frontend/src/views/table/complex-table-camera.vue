@@ -121,7 +121,7 @@
 </template>
 
 <script>
-import { fetchPv, createCamera, updateArticle, fetchProjectList, fetchCameraList} from '@/api/article'
+import {fetchPv, createCamera, updateArticle, fetchProjectList, fetchCameraList, fetchCameraDelete} from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 import {parseTime} from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -320,11 +320,15 @@ export default {
       })
     },
     handleDelete(row, index) {
-      this.$notify({
-        title: 'Success',
-        message: 'Delete Successfully',
-        type: 'success',
-        duration: 2000
+      fetchCameraDelete(row.id).then(() => {
+        this.list.unshift(this.temp)
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'Success',
+          message: 'Delete Successfully',
+          type: 'success',
+          duration: 2000
+        })
       })
       this.list.splice(index, 1)
     },

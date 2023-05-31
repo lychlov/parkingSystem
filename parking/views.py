@@ -89,6 +89,15 @@ class ProjectList(APIView):
                  })
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request, *args, **kwargs):
+        query = request.GET
+        pk = int(query.get('pk', 1))
+        item = Project.objects.get(id=pk)
+        item.delete()
+        return Response({
+            'code': 20000,
+            'data': 'success'
+        })
 
 class CameraList(APIView):
     def get(self, request, *args, **kwargs):
@@ -139,7 +148,15 @@ class CameraList(APIView):
                  'item': serializer.data
                  })
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    def delete(self, request, *args, **kwargs):
+        query = request.GET
+        pk = int(query.get('pk', 1))
+        item = Camera.objects.get(id=pk)
+        item.delete()
+        return Response({
+            'code': 20000,
+            'data': 'success'
+        })
 
 class RecordList(APIView):
 
@@ -202,6 +219,7 @@ class ManagerAuth(APIView):
         except Exception as e:
             return Response(e, status=status.HTTP_400_BAD_REQUEST)
 
+
 class ManagerList(APIView):
     def get(self, request, *args, **kwargs):
         query = request.GET
@@ -245,7 +263,15 @@ class ManagerList(APIView):
                  'item': serializer.data
                  })
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    def delete(self, request, *args, **kwargs):
+        query = request.GET
+        pk = int(query.get('pk', 1))
+        item = Manager.objects.get(id=pk)
+        item.delete()
+        return Response({
+            'code': 20000,
+            'data': 'success'
+        })
 
 class PassportList(APIView):
 
@@ -277,6 +303,8 @@ class PassportList(APIView):
         data_list = []
         for i in page_1:
             mode_to = PassportSerializer(i).data  # exclude这个是转字典的时候去掉，哪个字段，就是不给哪个字段转成字典
+            mode_to['enable_time'] = mode_to['enable_time'][:19].replace('T', ' ')
+            mode_to['overdue_time'] = mode_to['overdue_time'][:19].replace('T', ' ')
             data_list.append(mode_to)
         resp = {
             'code': 20000,

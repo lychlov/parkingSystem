@@ -93,6 +93,30 @@ export function createProject(data) {
   })
 }
 
+export function fetchProjectDelete(pk) {
+  return request({
+    url: '/projects/',
+    method: 'delete',
+    params: {pk}
+  })
+}
+
+export function fetchCameraDelete(pk) {
+  return request({
+    url: '/cameras/',
+    method: 'delete',
+    params: {pk}
+  })
+}
+
+export function fetchManagerDelete(pk) {
+  return request({
+    url: '/managers/',
+    method: 'delete',
+    params: {pk}
+  })
+}
+
 export function createArticle(data) {
   return request({
     url: '/passports/',

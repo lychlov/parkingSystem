@@ -46,25 +46,25 @@
           <span class="link-type" @click="handleUpdate(row)">{{ row.car_id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="可用时间" width="150px" align="center">
+      <el-table-column label="可用时间" width="200px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.enable_time }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="失效时间" width="150px" align="center">
+      <el-table-column label="失效时间" width="200px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.overdue_time }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="摄像头" min-width="150px">
+      <el-table-column label="摄像头" min-width="200px">
         <template slot-scope="{row}">
           <!--          <span class="link-type" @click="handleUpdate(row)">{{ row.title }}</span>-->
-          <span>{{ row.camera.id }}| {{ row.camera.ip_address }}</span>
+          <span>{{ row.camera.name }}| {{ row.camera.serial_number }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="项目" min-width="150px">
+      <el-table-column label="项目" min-width="200px">
         <template slot-scope="{row}">
-          <span>{{ row.camera.project.id }}| {{ row.camera.project.name }}</span>
+          <span>{{ row.camera.project.name }}| {{ row.camera.project.token }}</span>
         </template>
       </el-table-column>
       <el-table-column label="状态" class-name="status-col" width="100">
@@ -110,7 +110,7 @@
         </el-form-item>
         <el-form-item label="摄像头" prop="type" label-width="100px">
           <el-select v-model="temp.camera_id" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in cameraList" :key="item.id" :label="item.id + '|' + item.ip_address" :value="item.id" />
+            <el-option v-for="item in cameraList" :key="item.id" :label="item.name + '|' + item.serial_number" :value="item.id" />
           </el-select>
         </el-form-item>
       </el-form>
@@ -211,6 +211,7 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
+        camera_id: [{ required: true, message: 'type is required', trigger: 'change' }],
         camera: [{ required: true, message: 'type is required', trigger: 'change' }],
         enable_time: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
         overdue_time: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
