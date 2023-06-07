@@ -110,8 +110,11 @@ class CameraList(APIView):
         page = query.get('page', 1)  # 获取第几页
         limit = query.get('limit', 20)  # 每页有多少条数据
         title = query.get('title', '')
-        projects = [x.id for x in manager.projects.all()]
-        queryset = Camera.objects.filter(project_id__in=projects)
+        if manager.role.name == 'admin':
+            queryset = Camera.objects.all()
+        else:
+            projects = [x.id for x in manager.projects.all()]
+            queryset = Camera.objects.filter(project_id__in=projects)
         data_list = []
         for i in queryset:
             mode_to = CameraSerializer(i).data  # exclude这个是转字典的时候去掉，哪个字段，就是不给哪个字段转成字典
@@ -432,7 +435,7 @@ class DashboardView(APIView):
         camera = Camera.objects.count()
         passport = Passport.objects.count()
         record = Record.objects.count()
-        today = Record.objects.filter(record_date__gt=(datetime.datetime.now() - datetime.timedelta(days=1))).count()
+        today = Record.objects.filter(auto_first_date__gt=(datetime.datetime.now() - datetime.timedelta(days=1))).count()
         resp = {
             'code': 20000,
             'status': True,

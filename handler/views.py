@@ -30,13 +30,14 @@ def handle_heartbeat(data):
     if add_passport:
 
         white_list_data = []
+        timezone = pytz.timezone('Asia/Shanghai')
         for p in add_passport:
             temp = {
                 "plate": p.car_id,  # "津AEM182",
                 "enable": 1,
                 "need_alarm": 0,
-                "enable_time": p.enable_time.strftime('%Y-%m-%d %H:%M:%S'),  # "2023-05-01 11:11:11",
-                "overdue_time": p.overdue_time.strftime('%Y-%m-%d %H:%M:%S')
+                "enable_time": p.enable_time.astimezone(pytz.timezone('Asia/Shanghai')).strftime('%Y-%m-%d %H:%M:%S'),  # "2023-05-01 11:11:11",
+                "overdue_time": p.overdue_time.astimezone(pytz.timezone('Asia/Shanghai')).strftime('%Y-%m-%d %H:%M:%S')
             }
             white_list_data.append(temp)
             p.is_pushed = True
@@ -51,7 +52,7 @@ def handle_heartbeat(data):
         }
     elif delete_passport:
         white_list_data = []
-        for p in add_passport:
+        for p in delete_passport:
             temp = {
                 "plate": p.car_id,
                 "enable": 1,

@@ -18,7 +18,7 @@ export function fetchRecordList(query) {
 
 export function fetchIndex() {
   return request({
-    url: '/home_data',
+    url: '/home_data/',
     method: 'get'
     // params: query
   })

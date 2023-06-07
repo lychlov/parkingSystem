@@ -81,8 +81,6 @@ class Project(models.Model):
 class Camera(models.Model):
     project = models.ForeignKey(to=Project, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
-    # ip_address = models.GenericIPAddressField()
-    # camera_type = models.CharField(max_length=255)
     serial_number = models.CharField(max_length=255)
 
     def __str__(self):
